@@ -1,0 +1,116 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Hero Banner with Search -->
+  <div class="rounded-lg shadow-xl overflow-hidden mb-10 relative max-w-5xl mx-auto">
+    <!-- Background Image with Overlay -->
+    <div class="absolute inset-0">
+      <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://image.tmdb.org/t/p/original/wwemzKWzjKYJFfCeiB57q3r4Bcm.png');"></div>
+      <div class="absolute inset-0 bg-slate-800/85"></div>
+    </div>
+    
+    <!-- Content -->
+    <div class="relative z-10 p-8 text-white">
+      <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold mb-2 text-white">What Should I Watch Tonight? try</h1>
+        <p class="text-gray-200 mb-6">Find the perfect movie for your evening</p>
+        
+        <!-- Using the shared SearchComponent -->
+        <div class="max-w-xl mx-auto">
+          <app-search (searchResults)="onSearchResultsReceived($event)"></app-search>
+        </div>
+        <p class="text-gray-200 mt-2 text-sm">Press Enter or click Search to find movies and actors</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results Section -->
+  <div *ngIf="searchResults">
+    <!-- Movie Results -->
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">Movies</h2>
+      
+      <div *ngIf="searchedMovies.length === 0" class="text-gray-500">
+        <p>No movies found matching your search.</p>
+      </div>
+      
+      <div *ngIf="searchedMovies.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div *ngFor="let movie of searchedMovies" class="h-full">
+          <app-movie-card [movie]="movie"></app-movie-card>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actor Results -->
+    <div>
+      <h2 class="text-xl font-semibold mb-4">Actors</h2>
+      
+      <div *ngIf="searchedActors.length === 0" class="text-gray-500">
+        <p>No actors found matching your search.</p>
+      </div>
+      
+      <div *ngIf="searchedActors.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div *ngFor="let actor of searchedActors" class="text-center">
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <img 
+              *ngIf="actor.profile_path" 
+              [src]="'https://image.tmdb.org/t/p/w185' + actor.profile_path" 
+              [alt]="actor.name"
+              class="w-full h-40 object-cover">
+            <div *ngIf="!actor.profile_path" class="w-full h-40 bg-gray-200 flex items-center justify-center">
+              <span class="text-gray-500">No image</span>
+            </div>
+            <div class="p-2">
+              <p class="font-medium truncate">{{ actor.name }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mood Selection Section -->
+  <div *ngIf="!searchResults" class="text-center mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Select your mood</h2>
+    <p class="text-gray-600 mb-6">We'll suggest some movies for you</p>
+    
+    <div class="flex flex-wrap justify-center gap-4 mb-8">
+      <button 
+        *ngFor="let mood of ['Feel Good', 'Action Fix', 'Mind Benders']"
+        (click)="selectMood(mood)"
+        class="px-6 py-3 rounded-md text-white font-medium transition-colors"
+        [class.bg-slate-600]="selectedMood !== mood"
+        [class.bg-slate-800]="selectedMood === mood">
+        {{ mood }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Mood Results Section -->
+  <div *ngIf="loading" class="flex justify-center my-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-500"></div>
+  </div>
+
+  <div *ngIf="error" class="text-center text-red-500 my-8">
+    <p>Sorry, we couldn't load movie recommendations. Please try again later.</p>
+  </div>
+
+  <div *ngIf="selectedMood && !loading && !error && !searchResults">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold">{{ selectedMood }} Movies</h2>
+      <span *ngIf="cacheStatus" class="text-sm px-3 py-1 rounded-full" 
+            [ngClass]="{'bg-green-100 text-green-800': cacheStatus === 'Loaded from cache', 
+                       'bg-blue-100 text-blue-800': cacheStatus === 'Loaded from API'}">
+        {{ cacheStatus }}
+      </span>
+    </div>
+    
+    <div *ngIf="movies.length === 0" class="text-center text-gray-500 my-8">
+      <p>No movies found for this mood. Try another one!</p>
+    </div>
+    
+    <div *ngIf="movies.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div *ngFor="let movie of movies" class="h-full">
+        <app-movie-card [movie]="movie"></app-movie-card>
+      </div>
+    </div>
+  </div>
+</div>

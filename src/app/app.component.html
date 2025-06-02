@@ -1,0 +1,43 @@
+<!-- Main Container with Flex Column -->
+<div class="flex flex-col min-h-screen">
+  <!-- Header -->
+  <header class="bg-gray-800 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <a routerLink="/" class="text-xl font-bold mb-4 md:mb-0">What Should I Watch Tonight?</a>
+
+        <nav>
+          <ul class="flex space-x-6">
+            <li>
+              <a routerLink="/" routerLinkActive="text-blue-400" [routerLinkActiveOptions]="{exact: true}"
+                class="hover:text-blue-300">Home</a>
+            </li>
+            <li class="relative">
+              <a routerLink="/watchlist" routerLinkActive="text-blue-400" class="hover:text-blue-300">
+                My Watchlist
+                <span *ngIf="(watchlistCount$ | async) as count"
+                  class="absolute -top-2 -right-4 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  [hidden]="count <= 0">
+                  {{ count }}
+                </span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow pt-24 pb-8">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-2 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      <p>Movie data provided by <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer"
+          class="text-blue-400 hover:underline">TMDB</a></p>
+    </div>
+  </footer>
+</div>

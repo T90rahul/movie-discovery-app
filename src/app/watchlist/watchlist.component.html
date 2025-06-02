@@ -1,0 +1,28 @@
+<div class="container mx-auto px-4 py-4">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold">My Watchlist</h1>
+    
+    <button 
+      *ngIf="(watchlist$ | async)?.length"
+      (click)="clearWatchlist()" 
+      class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+      Clear Watchlist
+    </button>
+  </div>
+  
+  <ng-container *ngIf="watchlist$ | async as watchlist">
+    <div *ngIf="watchlist.length === 0" class="text-center text-gray-500 my-12">
+      <p class="text-lg mb-4">Your watchlist is empty.</p>
+      <p>Add movies to your watchlist by clicking the heart icon on movie cards.</p>
+      <a routerLink="/" class="inline-block mt-6 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        Discover Movies
+      </a>
+    </div>
+    
+    <div *ngIf="watchlist.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div *ngFor="let movie of watchlist" class="h-full">
+        <app-movie-card [movie]="movie"></app-movie-card>
+      </div>
+    </div>
+  </ng-container>
+</div>

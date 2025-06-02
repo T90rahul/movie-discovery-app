@@ -1,0 +1,17 @@
+/* Custom styles for rounded search bar */
+.rounded-full-left {
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+}
+
+.rounded-full-right {
+  border-top-right-radius: 9999px;
+  border-bottom-right-radius: 9999px;
+}
+
+/* Hero banner styles */
+.hero-banner {
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+}

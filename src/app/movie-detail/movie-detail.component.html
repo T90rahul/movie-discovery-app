@@ -1,0 +1,174 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Back button -->
+  <button (click)="goBack()" class="mb-4 px-4 py-2 bg-gray-600 text-white rounded-md flex items-center hover:bg-gray-700">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+    </svg>
+    Back
+  </button>
+
+  <div *ngIf="loading" class="flex justify-center my-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <div *ngIf="error" class="text-center text-red-500 my-8">
+    <p>Sorry, we couldn't load the movie details. Please try again later.</p>
+    <button routerLink="/" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md">
+      Back to Home
+    </button>
+  </div>
+
+  <div *ngIf="movie && !loading && !error">
+    <!-- Movie Header -->
+    <div class="relative">
+      <!-- Backdrop Image -->
+      <div *ngIf="movie.backdrop_path" class="absolute inset-0 bg-cover bg-center opacity-20" 
+           [style.background-image]="'url(' + getMovieBackdropUrl(movie.backdrop_path) + ')'">
+      </div>
+      
+      <div class="relative z-10 flex flex-col md:flex-row gap-8 p-6 bg-white bg-opacity-90 rounded-lg shadow-lg">
+        <!-- Poster -->
+        <div class="w-full md:w-1/3 lg:w-1/4 flex-shrink-0">
+          <div class="poster-container" style="aspect-ratio: 2/3;">
+            <img [src]="getMoviePosterUrl(movie.poster_path)" [alt]="movie.title" class="w-full h-full object-cover rounded-md shadow-md">
+          </div>
+          
+          <button 
+            (click)="toggleWatchlist()" 
+            class="mt-4 w-full py-2 px-4 flex items-center justify-center rounded-md"
+            [class.bg-red-600]="isInWatchlist()"
+            [class.bg-gray-700]="!isInWatchlist()"
+            [class.text-white]="true">
+            <svg *ngIf="isInWatchlist()" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+            </svg>
+            <svg *ngIf="!isInWatchlist()" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+            </svg>
+            {{ isInWatchlist() ? 'Remove from Watchlist' : 'Add to Watchlist' }}
+          </button>
+        </div>
+        
+        <!-- Movie Info -->
+        <div class="flex-grow">
+          <h1 class="text-3xl font-bold mb-2">{{ movie.title }}</h1>
+          
+          <div *ngIf="movie.tagline" class="text-gray-600 italic mb-4">
+            "{{ movie.tagline }}"
+          </div>
+          
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span *ngFor="let genre of movie.genres" class="px-3 py-1 bg-gray-200 rounded-full text-sm">
+              {{ genre.name }}
+            </span>
+          </div>
+          
+          <div class="flex items-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <span class="ml-1 font-semibold">{{ movie.vote_average | number:'1.1-1' }}/10</span>
+            
+            <span class="mx-4 text-gray-400">|</span>
+            
+            <span>{{ movie.release_date | date:'yyyy' }}</span>
+            
+            <span *ngIf="movie.runtime" class="mx-4 text-gray-400">|</span>
+            
+            <span *ngIf="movie.runtime">{{ movie.runtime }} min</span>
+          </div>
+
+          <div class="flex items-center">
+            <p *ngIf="movie.overview" class="text-lg text-justify">{{ movie.overview }}</p>
+            <p *ngIf="!movie.overview" class=" text-gray-500 text-center">No overview available for this movie.</p>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="text-xl font-semibold mb-3">Top Cast</h3>
+            <div class="w-full overflow-x-auto pb-4 scrollbar-hide">
+              <div class="flex space-x-4 min-w-0">
+                <div *ngIf="cast.length === 0" class="bg-gray-100 rounded-lg p-4 text-gray-500 text-center">
+                  <p>No cast information available for this movie.</p>
+                </div>
+                <div *ngFor="let actor of cast.slice(0, 5)" class="flex-shrink-0 w-28">
+                  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img 
+                      *ngIf="actor.profile_path" 
+                      [src]="'https://image.tmdb.org/t/p/w185' + actor.profile_path" 
+                      [alt]="actor.name"
+                      class="w-full h-36 object-cover">
+                    <div *ngIf="!actor.profile_path" class="w-full h-36 bg-gray-200 flex items-center justify-center">
+                      <span class="text-gray-500">No image</span>
+                    </div>
+                    <div class="p-2 text-center">
+                      <p class="font-medium text-sm truncate">{{ actor.name }}</p>
+                      <p *ngIf="actor.character" class="text-xs text-gray-600 truncate">{{ actor.character }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="mt-8 border-b border-gray-200">
+      <div class="flex">
+        <button 
+          (click)="setActiveTab('trailer')" 
+          class="px-4 py-2 font-medium"
+          [class.text-blue-600]="activeTab === 'trailer'"
+          [class.border-b-2]="activeTab === 'trailer'"
+          [class.border-blue-600]="activeTab === 'trailer'">
+          Trailer
+        </button>
+        <button 
+          (click)="setActiveTab('similar')" 
+          class="px-4 py-2 font-medium"
+          [class.text-blue-600]="activeTab === 'similar'"
+          [class.border-b-2]="activeTab === 'similar'"
+          [class.border-blue-600]="activeTab === 'similar'">
+          Similar Movies
+        </button>
+      </div>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="mt-6">
+      <!-- Overview Tab -->
+      <div *ngIf="activeTab === 'trailer'" class="space-y-6">    
+         <div *ngIf="!trailerUrl" class="text-gray-500 text-center py-8">
+          <p>No trailer available.</p>
+        </div>
+        <!-- Trailer -->
+        <div *ngIf="trailerUrl" class="mt-8">
+          <div class="aspect-w-16 aspect-h-9 mt-4">
+            <iframe 
+              [src]="trailerUrl | safeUrl" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen
+              class="w-full h-96">
+            </iframe>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Similar Movies Tab -->
+      <div *ngIf="activeTab === 'similar'">
+        <div *ngIf="similarMovies.length === 0" class="text-gray-500 text-center py-8">
+          <p>No similar movies found.</p>
+        </div>
+        
+        <div *ngIf="similarMovies.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div *ngFor="let movie of similarMovies" class="h-full">
+            <app-movie-card [movie]="movie"></app-movie-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
