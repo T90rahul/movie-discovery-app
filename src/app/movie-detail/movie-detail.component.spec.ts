@@ -7,6 +7,7 @@ import { WatchlistService } from '../core/services/watchlist.service';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { Component, Input, Pipe, PipeTransform } from '@angular/core';
+import { Movie } from '../core/models/movie.model';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 // Mock SafeUrlPipe
@@ -27,7 +28,7 @@ class MockSafeUrlPipe implements PipeTransform {
   template: '<div class="mock-movie-card">{{movie.title}}</div>'
 })
 class MockMovieCardComponent {
-  @Input() movie: any;
+  @Input() movie!: Movie;
 }
 
 // Mock movie detail template to avoid iframe issues
@@ -77,7 +78,9 @@ describe('MovieDetailComponent', () => {
       { id: 1, name: 'Actor 1', profile_path: '/actor1.jpg', character: 'Character 1' },
       { id: 2, name: 'Actor 2', profile_path: '/actor2.jpg', character: 'Character 2' }
     ],
-    crew: []
+    crew: [
+      { id: 3, name: 'Director', profile_path: '/director.jpg', job: 'Director', department: 'Directing' }
+    ]
   };
 
   const mockVideos = {

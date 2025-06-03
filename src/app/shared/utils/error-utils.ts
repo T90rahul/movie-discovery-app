@@ -2,8 +2,20 @@
  * Sanitizes error messages by removing potentially harmful characters
  * and formatting for safe console output
  */
-export function sanitizeError(err: any): string {
-  let message = typeof err === 'string' ? err : (err?.message || err?.toString() || 'Unknown error');
+export function sanitizeError(err: unknown): string {
+  let message: string;
+  
+  if (typeof err === 'string') {
+    message = err;
+  } else if (err instanceof Error) {
+    message = err.message;
+  } else if (err && typeof err === 'object' && 'message' in err && typeof (err as {message: unknown}).message === 'string') {
+    message = (err as {message: string}).message;
+  } else if (err && typeof err === 'object') {
+    message = Object.prototype.toString.call(err);
+  } else {
+    message = 'Unknown error';
+  }
 
   // Replace CR/LF/newlines to prevent fake log lines
   message = message.replace(/[\r\n]+/g, ' ');

@@ -5,7 +5,7 @@ import { TmdbService } from '../core/services/tmdb.service';
 import { NavigationStateService } from '../core/services/navigation-state.service';
 import { of, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { MovieResponse, ActorResponse } from '../core/models/movie.model';
+import { Movie, MovieResponse, ActorResponse } from '../core/models/movie.model';
 import { Component, Input } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 
@@ -15,7 +15,7 @@ import { RouterTestingModule } from '@angular/router/testing';
   template: '<div class="mock-movie-card">{{movie.title}}</div>'
 })
 class MockMovieCardComponent {
-  @Input() movie: any;
+  @Input() movie!: Movie;
 }
 
 describe('SearchComponent', () => {
@@ -106,8 +106,8 @@ describe('SearchComponent', () => {
     
     component.searchControl.setValue('test');
     component.loading = false; // Ensure loading is false
-    // Access private property using type assertion
-    (component as any).lastSearchTime = 0; // Reset throttle
+    // Access private property for testing
+    Object.defineProperty(component, 'lastSearchTime', { value: 0 });
     fixture.detectChanges();
     
     // Call onSearch directly instead of using button click

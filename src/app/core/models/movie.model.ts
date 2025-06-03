@@ -36,9 +36,17 @@ export interface Video {
   type: string;
 }
 
+export interface CrewMember {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  job: string;
+  department: string;
+}
+
 export interface MovieCredits {
   cast: Actor[];
-  crew: any[];
+  crew: CrewMember[];
 }
 
 export interface MovieResponse {
